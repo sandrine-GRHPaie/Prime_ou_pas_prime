@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prime ou pas prime ?</title>
+<style>
+  :root {
+    --bleu-titre: #2579C6;
+    --bleu-fonce: #3C5872;
+    --vert: #49C726;
+    --orange: #C78A26;
+    --rose: #C726A9;
+    --cyan: #2AB0BF;
+    --fond: #F9FBFD;
+    --blanc: #ffffff;
+    --gris-leger: #edf2f7;
+    --shadow: 0 2px 12px rgba(37,121,198,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background: var(--fond);
+    color: var(--bleu-fonce);
+    min-height: 100vh;
+    padding: 32px 16px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    color: var(--bleu-titre);
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+  }
+
+  .consigne {
+    color: var(--orange);
+    font-size: 1rem;
+    font-weight: 600;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .compteur {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: var(--bleu-fonce);
+    opacity: 0.7;
+  }
+
+  .grille {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* En-tête tableau */
+  .ligne-header {
+    display: grid;
+    grid-template-columns: 1fr 110px 110px 36px;
+    gap: 8px;
+    padding: 8px 14px;
+    font-weight: 800;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--bleu-titre);
+    border-bottom: 2px solid var(--bleu-titre);
+  }
+
+  .col-situation { /* colonne principale */ }
+  .col-prime, .col-pas-prime {
+    text-align: center;
+  }
+
+  /* Chaque ligne */
+  .ligne {
+    display: grid;
+    grid-template-columns: 1fr 110px 110px 36px;
+    gap: 8px;
+    align-items: center;
+    background: var(--blanc);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s;
+  }
+
+  .ligne:hover {
+    box-shadow: 0 4px 18px rgba(37,121,198,0.15);
+  }
+
+  .situation {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--bleu-fonce);
+  }
+
+  .case-radio {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Radio custom */
+  .case-radio input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--bleu-titre);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+
+  .case-radio input[type="radio"]:checked {
+    background: var(--bleu-titre);
+    border-color: var(--bleu-titre);
+  }
+
+  .case-radio input[type="radio"]:checked::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  /* Icône résultat */
+  .icone-resultat {
+    text-align: center;
+    font-size: 1.3rem;
+    min-width: 36px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  /* Explication */
+  .ligne-explication {
+    display: none;
+    grid-column: 1 / -1;
+    padding: 10px 14px 4px;
+    font-size: 0.84rem;
+    line-height: 1.55;
+    border-radius: 0 0 8px 8px;
+    margin-top: -6px;
+  }
+
+  /* États après validation */
+  .ligne.correct {
+    border-left: 4px solid var(--vert);
+  }
+  .ligne.incorrect {
+    border-left: 4px solid var(--rose);
+  }
+
+  .ligne.correct .icone-resultat {
+    opacity: 1;
+    color: var(--vert);
+  }
+  .ligne.incorrect .icone-resultat {
+    opacity: 1;
+    color: var(--rose);
+  }
+
+  .ligne.correct + .ligne-explication,
+  .ligne.incorrect + .ligne-explication {
+    display: block;
+  }
+
+  .ligne-explication {
+    background: var(--gris-leger);
+    color: var(--bleu-fonce);
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 10px rgba(37,121,198,0.07);
+    border-left: 4px solid transparent;
+  }
+
+  .ligne.correct + .ligne-explication {
+    border-left-color: var(--vert);
+  }
+  .ligne.incorrect + .ligne-explication {
+    border-left-color: var(--rose);
+  }
+
+  /* Wrapper pour grouper ligne + explication */
+  .groupe {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Bouton valider */
+  .zone-bouton {
+    text-align: center;
+    margin-top: 32px;
+  }
+
+  button#valider {
+    background: var(--bleu-titre);
+    color: white;
+    border: none;
+    padding: 14px 44px;
+    border-radius: 50px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 18px rgba(37,121,198,0.30);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+  }
+
+  button#valider:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37,121,198,0.35);
+  }
+
+  button#valider:active {
+    transform: translateY(0);
+  }
+
+  button#valider:disabled {
+    background: #aac4e0;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+
+  /* Résultat final */
+  #bilan {
+    display: none;
+    max-width: 960px;
+    margin: 28px auto 0;
+    background: var(--blanc);
+    border-radius: 14px;
+    padding: 24px 28px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+
+  #bilan h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--bleu-titre);
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+
+  #bilan .score {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--bleu-fonce);
+  }
+
+  #bilan .score span {
+    color: var(--bleu-titre);
+  }
+
+  #bilan .mention {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: var(--orange);
+    font-weight: 600;
+  }
+
+  button#recommencer {
+    margin-top: 18px;
+    background: transparent;
+    color: var(--bleu-titre);
+    border: 2px solid var(--bleu-titre);
+    padding: 10px 32px;
+    border-radius: 50px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  button#recommencer:hover {
+    background: var(--bleu-titre);
+    color: white;
+  }
+
+  /* Alerte si non répondu */
+  .alerte-manquant {
+    display: none;
+    max-width: 960px;
+    margin: 14px auto 0;
+    background: #fff4e0;
+    border-left: 4px solid var(--orange);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    color: var(--orange);
+    font-weight: 600;
+  }
+
+  /* Désactiver radios après validation */
+  .valide input[type="radio"] {
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Prime ou pas prime ?</h1>
+  <p class="consigne">Pour chaque situation, cochez la case qui correspond : la somme versée est-elle une prime ou non ? Répondez aux 16 cas, puis cliquez sur « Valider ».</p>
+  <p class="compteur" id="compteur">0 / 16 réponses</p>
+</header>
+
+<div class="grille" id="grille">
+
+  <div class="ligne-header">
+    <div class="col-situation">Situation</div>
+    <div class="col-prime">Prime</div>
+    <div class="col-pas-prime">Pas prime</div>
+    <div></div>
+  </div>
+
+</div>
+
+<div class="alerte-manquant" id="alerte">Certaines situations n'ont pas encore de réponse. Répondez à toutes les cases avant de valider.</div>
+
+<div class="zone-bouton">
+  <button id="valider">Valider mes réponses</button>
+</div>
+
+<div id="bilan">
+  <h2>Résultat</h2>
+  <div class="score"><span id="nb-correct">0</span> / 16</div>
+  <div class="mention" id="mention"></div>
+  <br>
+  <button id="recommencer">Recommencer</button>
+</div>
+
+<script>
+const cas = [
+  {
+    situation: "L'employeur verse à tous les salariés qui travaillent de nuit un montant correspondant à une heure de travail au titre des frais repas.",
+    bonne: "prime",
+    explication: "C'est un complément de rémunération qui ne correspond pas au calcul de frais réels ou forfaitaires."
+  },
+  {
+    situation: "Un salarié perçoit un salaire annuel de 32 500 euros versé sur 13 mois.",
+    bonne: "pas-prime",
+    explication: "C'était piégeux. Le montant est un élément du salaire brut mais ce n'est pas une prime. Le salaire de base annuel est versé sur la base de 13 mois."
+  },
+  {
+    situation: "Un salarié perçoit une prime de transport calculée en fonction de l'éloignement domicile/lieu de travail. Elle n'est pas versée lorsque le salarié est en congés ou en arrêt.",
+    bonne: "pas-prime",
+    explication: "La « prime » est visiblement versée pour dédommager le salarié de ses frais de déplacement."
+  },
+  {
+    situation: "La CCN de l'entreprise a prévu que les temps d'habillage et déshabillage obligatoires seraient du temps de travail effectif.",
+    bonne: "pas-prime",
+    explication: "Dans ce cas, le temps d'habillage est du temps de travail effectif. Dit autrement, c'est du temps déduit des heures de travail rémunérées par le salaire de base ou du temps compté en HS/HC."
+  },
+  {
+    situation: "Un salarié perçoit 2 400 euros, son collègue sur un poste équivalent perçoit 2 500 euros : la grille de salaire prévoit une majoration de 50 euros par tranche de 5 ans d'ancienneté pour tenir compte de l'expérience des salariés.",
+    bonne: "pas-prime",
+    explication: "C'est piégeux : il ne s'agit pas d'une prime d'ancienneté. Le salaire de base augmente avec l'ancienneté du salarié. La prime d'ancienneté rémunère la fidélité. Ici, la majoration rémunère l'expérience."
+  },
+  {
+    situation: "Les salariés présents au 31 décembre dans l'entreprise perçoivent une prime de fin d'année d'un montant équivalent à un mois de salaire. Cette prime est proratisée pour les salariés embauchés en cours d'année.",
+    bonne: "prime",
+    explication: "Il s'agit d'une prime de fin d'année ou de treizième mois. Son montant est calculé à partir du salaire mais elle ne rémunère pas le travail du salarié. Elle est liée à la présence dans l'entreprise."
+  },
+  {
+    situation: "Un salarié perçoit un salaire de 2 100 euros et une prime calculée en fonction du nombre de pièces produites.",
+    bonne: "prime",
+    explication: "C'est une prime de rendement individuel."
+  },
+  {
+    situation: "Un salarié perçoit une prime de froid. Elle correspond à 10 % de son salaire mensuel, HS comprises.",
+    bonne: "prime",
+    explication: "La prime de froid compense les conditions de travail."
+  },
+  {
+    situation: "Le salarié perçoit une prime mensuelle de 150 euros pour le récompenser de sa présence au travail. La prime est maintenue durant ses CP et en cas d'accident du travail. Mais elle est intégralement supprimée pour toutes les autres absences, même si le salaire est maintenu (absence pour évènement familial, arrêt maladie…).",
+    bonne: "prime",
+    explication: "Il s'agit d'une prime d'assiduité."
+  },
+  {
+    situation: "Un salarié travaille de nuit. Pour chaque nuit travaillée, il perçoit une prime de panier calculée forfaitairement à partir des barèmes URSSAF.",
+    bonne: "pas-prime",
+    explication: "Dans ce cas, la « prime » est assimilée à un remboursement de frais forfaitaire pour compenser le surcoût du repas lié aux horaires atypiques."
+  },
+  {
+    situation: "Un salarié a un emploi très salissant. En arrivant au travail, il se change. Pour travailler, il porte une combinaison dont l'entretien est assuré par le service lingerie de l'entreprise. Il perçoit une prime frais de nettoyage de 50 euros par mois.",
+    bonne: "prime",
+    explication: "L'entretien est assuré par l'entreprise, le salarié n'a pas de frais. La prime est un complément de salaire liée à ses conditions de travail (prime de sujétion) ou une contrepartie au temps consacré à l'habillage."
+  },
+  {
+    situation: "L'employeur vient d'avoir un enfant. Pour fêter l'évènement, il décide d'attribuer une prime de 100 euros à l'ensemble des salariés.",
+    bonne: "prime",
+    explication: "C'est une prime exceptionnelle sans lien avec l'emploi."
+  },
+  {
+    situation: "Un salarié perçoit 1,5 euro par pièce produite. S'il ne produit pas assez de pièces pour atteindre le SMIC, l'employeur lui verse un complément.",
+    bonne: "pas-prime",
+    explication: "Le salarié est rémunéré à la pièce. C'est une forme de rémunération (comme le salaire de base mensualisé en est une autre). Ce n'est pas un complément à sa rémunération."
+  },
+  {
+    situation: "Les salariés de l'entreprise ayant des enfants scolarisés perçoivent une prime de 200 euros par enfant à la rentrée scolaire.",
+    bonne: "prime",
+    explication: "C'est une prime liée à la situation familiale, sans lien avec l'activité ou l'emploi."
+  },
+  {
+    situation: "Ce directeur commercial d'une grande entreprise dans le luxe perçoit une prime de représentation pour s'acheter des costumes de marque.",
+    bonne: "pas-prime",
+    explication: "Ce sont des frais de représentation."
+  },
+  {
+    situation: "À chacun de ses déplacements professionnels, un salarié perçoit une prime de dépaysement d'un montant de 250 euros. L'entreprise s'occupe des réservations de transport et de logement.",
+    bonne: "prime",
+    explication: "Les frais de déplacement et d'hébergement sont pris en charge par l'entreprise. La somme est un montant forfaitaire quelle que soit la distance : il s'agit d'une prime pour compenser la sujétion."
+  }
+];
+
+let reponses = {};
+let valide = false;
+
+function construireGrille() {
+  const grille = document.getElementById('grille');
+  // Garder uniquement l'en-tête
+  while (grille.children.length > 1) grille.removeChild(grille.lastChild);
+
+  cas.forEach((c, i) => {
+    const groupe = document.createElement('div');
+    groupe.className = 'groupe';
+
+    const ligne = document.createElement('div');
+    ligne.className = 'ligne';
+    ligne.dataset.index = i;
+
+    ligne.innerHTML = `
+      <div class="situation">${c.situation}</div>
+      <div class="case-radio">
+        <input type="radio" name="q${i}" value="prime" id="q${i}_prime">
+      </div>
+      <div class="case-radio">
+        <input type="radio" name="q${i}" value="pas-prime" id="q${i}_pas">
+      </div>
+      <div class="icone-resultat" id="icone${i}"></div>
+    `;
+
+    const expl = document.createElement('div');
+    expl.className = 'ligne-explication';
+    expl.id = `expl${i}`;
+    expl.textContent = c.explication;
+
+    groupe.appendChild(ligne);
+    groupe.appendChild(expl);
+    grille.appendChild(groupe);
+
+    // Écoute des radios
+    ligne.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        reponses[i] = radio.value;
+        majCompteur();
+      });
+    });
+  });
+}
+
+function majCompteur() {
+  const nb = Object.keys(reponses).length;
+  document.getElementById('compteur').textContent = `${nb} / 16 réponses`;
+}
+
+document.getElementById('valider').addEventListener('click', () => {
+  if (valide) return;
+
+  // Vérifier que tout est répondu
+  if (Object.keys(reponses).length < 16) {
+    document.getElementById('alerte').style.display = 'block';
+    return;
+  }
+  document.getElementById('alerte').style.display = 'none';
+
+  valide = true;
+  let correct = 0;
+
+  cas.forEach((c, i) => {
+    const ligne = document.querySelector(`.ligne[data-index="${i}"]`);
+    const icone = document.getElementById(`icone${i}`);
+    const rep = reponses[i];
+
+    if (rep === c.bonne) {
+      ligne.classList.add('correct');
+      icone.textContent = '✓';
+      correct++;
+    } else {
+      ligne.classList.add('incorrect');
+      icone.textContent = '✗';
+    }
+    ligne.classList.add('valide');
+  });
+
+  // Bilan
+  document.getElementById('nb-correct').textContent = correct;
+  const pct = (correct / 16) * 100;
+  let mention = '';
+  if (pct === 100) mention = 'Excellent ! Toutes les réponses sont correctes.';
+  else if (pct >= 75) mention = 'Très bien ! Quelques points à revoir.';
+  else if (pct >= 50) mention = 'Pas mal, mais certaines notions méritent d\'être approfondies.';
+  else mention = 'Prenez le temps de revoir les distinctions clés.';
+
+  document.getElementById('mention').textContent = mention;
+  document.getElementById('bilan').style.display = 'block';
+  document.getElementById('valider').disabled = true;
+
+  document.getElementById('bilan').scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+document.getElementById('recommencer').addEventListener('click', () => {
+  reponses = {};
+  valide = false;
+  document.getElementById('valider').disabled = false;
+  document.getElementById('bilan').style.display = 'none';
+  document.getElementById('alerte').style.display = 'none';
+  construireGrille();
+  majCompteur();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+construireGrille();
+majCompteur();
+</script>
+</body>
+</html>
