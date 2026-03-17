@@ -18,13 +18,28 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  .bandeau {
+    background: var(--bleu-titre);
+    color: rgba(255,255,255,0.75);
+    text-align: center;
+    padding: 10px 16px;
+    font-size: 0.78rem;
+    letter-spacing: 0.3px;
+    margin-top: 36px;
+  }
+
+  .contenu {
+    padding: 24px 16px 0;
+  }
+
   body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background: var(--fond);
     color: var(--bleu-fonce);
-    padding: 32px 16px 60px;
+    padding: 0 0 0;
     font-size: 0.88rem;
   }
+
 
   h1 {
     font-family: Georgia, 'Times New Roman', serif;
@@ -396,6 +411,7 @@
 </head>
 <body>
 
+<div class="contenu">
 <h1>Prime ou pas prime ?</h1>
 <p class="consigne">Pour chaque situation, cochez la case qui correspond : la somme versée est-elle une prime ou non ? La correction s'affiche immédiatement après votre choix.</p>
 
@@ -686,6 +702,10 @@
 
   </tbody>
 </table>
+
+</div><!-- fin .contenu -->
+
+<div class="bandeau">Sandrine GRH Paie</div>
 
 </body>
 </html>
