@@ -128,13 +128,61 @@
     transition: background 0.15s;
   }
 
-  /* Quand le radio correspondant est coché */
+  /* Hover sur les boutons */
+  label.btn-choix:hover {
+    background: #d0e6f7;
+  }
+
+  /* Quand le radio correspondant est coché — bleu par défaut */
   input[type="radio"]:checked + label.btn-choix {
     background: var(--bleu-titre);
+    border-color: var(--bleu-titre);
   }
 
   input[type="radio"]:checked + label.btn-choix::after {
     background: white;
+  }
+
+  /* Bonne réponse : label prime devient vert */
+  #c1_prime:checked ~ .grille label[for="c1_prime"],
+  #c2_pas:checked ~ .grille label[for="c2_pas"],
+  #c3_pas:checked ~ .grille label[for="c3_pas"],
+  #c4_pas:checked ~ .grille label[for="c4_pas"],
+  #c5_pas:checked ~ .grille label[for="c5_pas"],
+  #c6_prime:checked ~ .grille label[for="c6_prime"],
+  #c7_prime:checked ~ .grille label[for="c7_prime"],
+  #c8_prime:checked ~ .grille label[for="c8_prime"],
+  #c9_prime:checked ~ .grille label[for="c9_prime"],
+  #c10_pas:checked ~ .grille label[for="c10_pas"],
+  #c11_prime:checked ~ .grille label[for="c11_prime"],
+  #c12_prime:checked ~ .grille label[for="c12_prime"],
+  #c13_pas:checked ~ .grille label[for="c13_pas"],
+  #c14_prime:checked ~ .grille label[for="c14_prime"],
+  #c15_pas:checked ~ .grille label[for="c15_pas"],
+  #c16_prime:checked ~ .grille label[for="c16_prime"] {
+    background: var(--vert);
+    border-color: var(--vert);
+  }
+
+  /* Mauvaise réponse : label coché devient rose */
+  #c1_pas:checked ~ .grille label[for="c1_pas"],
+  #c2_prime:checked ~ .grille label[for="c2_prime"],
+  #c3_prime:checked ~ .grille label[for="c3_prime"],
+  #c4_prime:checked ~ .grille label[for="c4_prime"],
+  #c5_prime:checked ~ .grille label[for="c5_prime"],
+  #c6_pas:checked ~ .grille label[for="c6_pas"],
+  #c7_pas:checked ~ .grille label[for="c7_pas"],
+  #c8_pas:checked ~ .grille label[for="c8_pas"],
+  #c9_pas:checked ~ .grille label[for="c9_pas"],
+  #c10_prime:checked ~ .grille label[for="c10_prime"],
+  #c11_pas:checked ~ .grille label[for="c11_pas"],
+  #c12_pas:checked ~ .grille label[for="c12_pas"],
+  #c13_prime:checked ~ .grille label[for="c13_prime"],
+  #c14_pas:checked ~ .grille label[for="c14_pas"],
+  #c15_prime:checked ~ .grille label[for="c15_prime"],
+  #c16_pas:checked ~ .grille label[for="c16_pas"] {
+    background: var(--rose);
+    border-color: var(--rose);
   }
 
   /* =============================================
